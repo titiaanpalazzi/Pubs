@@ -1,0 +1,99 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<document type="com.apple.InterfaceBuilder3.CocoaTouch.Storyboard.XIB" version="3.0" toolsVersion="6254" systemVersion="14C1514" targetRuntime="iOS.CocoaTouch" propertyAccessControl="none" useAutolayout="YES" useTraitCollections="YES" initialViewController="Ing-xP-gMU">
+    <dependencies>
+        <plugIn identifier="com.apple.InterfaceBuilder.IBCocoaTouchPlugin" version="6247"/>
+    </dependencies>
+    <scenes>
+        <!--RMI Publications-->
+        <scene sceneID="N19-IE-lnP">
+            <objects>
+                <tableViewController id="bJs-vd-C3w" customClass="PublicationTableViewController" customModule="Publications" customModuleProvider="target" sceneMemberID="viewController">
+                    <tableView key="view" clipsSubviews="YES" contentMode="scaleToFill" alwaysBounceVertical="YES" dataMode="prototypes" style="plain" separatorStyle="default" allowsMultipleSelection="YES" rowHeight="44" sectionHeaderHeight="22" sectionFooterHeight="22" id="Txo-Ed-uMr">
+                        <rect key="frame" x="0.0" y="0.0" width="600" height="600"/>
+                        <autoresizingMask key="autoresizingMask" widthSizable="YES" heightSizable="YES"/>
+                        <color key="backgroundColor" white="1" alpha="1" colorSpace="calibratedWhite"/>
+                        <searchBar key="tableHeaderView" contentMode="redraw" placeholder="Search for publications" id="JAy-xU-hi6">
+                            <rect key="frame" x="0.0" y="0.0" width="600" height="44"/>
+                            <autoresizingMask key="autoresizingMask" widthSizable="YES" flexibleMaxY="YES"/>
+                            <textInputTraits key="textInputTraits"/>
+                            <connections>
+                                <outlet property="delegate" destination="bJs-vd-C3w" id="aeh-HH-4mo"/>
+                            </connections>
+                        </searchBar>
+                        <prototypes>
+                            <tableViewCell contentMode="scaleToFill" selectionStyle="default" indentationWidth="10" reuseIdentifier="Cell" textLabel="ubb-Su-lo2" detailTextLabel="PNc-vX-MW7" style="IBUITableViewCellStyleSubtitle" id="fhb-dS-nzS">
+                                <autoresizingMask key="autoresizingMask"/>
+                                <tableViewCellContentView key="contentView" opaque="NO" clipsSubviews="YES" multipleTouchEnabled="YES" contentMode="center" tableViewCell="fhb-dS-nzS" id="3df-sA-cZK">
+                                    <autoresizingMask key="autoresizingMask"/>
+                                    <subviews>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Title" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="ubb-Su-lo2">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="16"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                        <label opaque="NO" multipleTouchEnabled="YES" contentMode="left" text="Subtitle" lineBreakMode="tailTruncation" baselineAdjustment="alignBaselines" adjustsFontSizeToFit="NO" id="PNc-vX-MW7">
+                                            <autoresizingMask key="autoresizingMask" flexibleMaxX="YES" flexibleMaxY="YES"/>
+                                            <fontDescription key="fontDescription" type="system" pointSize="11"/>
+                                            <color key="textColor" cocoaTouchSystemColor="darkTextColor"/>
+                                            <nil key="highlightedColor"/>
+                                        </label>
+                                    </subviews>
+                                </tableViewCellContentView>
+                            </tableViewCell>
+                        </prototypes>
+                        <connections>
+                            <outlet property="dataSource" destination="bJs-vd-C3w" id="gcq-zf-UtW"/>
+                            <outlet property="delegate" destination="bJs-vd-C3w" id="a4F-HC-AOu"/>
+                        </connections>
+                    </tableView>
+                    <navigationItem key="navigationItem" title="RMI Publications" id="4wT-3r-DSU">
+                        <barButtonItem key="leftBarButtonItem" title="Mail" id="7sj-Ii-zBV">
+                            <connections>
+                                <action selector="mail:" destination="bJs-vd-C3w" id="fGd-6V-Kwi"/>
+                            </connections>
+                        </barButtonItem>
+                    </navigationItem>
+                    <connections>
+                        <outlet property="searchDisplayController" destination="SLl-xg-6yC" id="RIU-RR-FKZ"/>
+                    </connections>
+                </tableViewController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="cWf-a5-364" userLabel="First Responder" sceneMemberID="firstResponder"/>
+                <searchDisplayController id="1x5-dh-qSb">
+                    <connections>
+                        <outlet property="delegate" destination="bJs-vd-C3w" id="Yf3-5O-cpD"/>
+                        <outlet property="searchContentsController" destination="bJs-vd-C3w" id="Gsl-XI-efq"/>
+                        <outlet property="searchResultsDataSource" destination="bJs-vd-C3w" id="YHp-R1-pxr"/>
+                        <outlet property="searchResultsDelegate" destination="bJs-vd-C3w" id="JAx-9o-cFK"/>
+                    </connections>
+                </searchDisplayController>
+                <searchDisplayController id="SLl-xg-6yC">
+                    <connections>
+                        <outlet property="delegate" destination="bJs-vd-C3w" id="ShG-O6-S1w"/>
+                        <outlet property="searchBar" destination="JAy-xU-hi6" id="ybA-Pq-1ag"/>
+                        <outlet property="searchContentsController" destination="bJs-vd-C3w" id="Ker-cU-gJ5"/>
+                        <outlet property="searchResultsDataSource" destination="bJs-vd-C3w" id="JnJ-eQ-LQh"/>
+                        <outlet property="searchResultsDelegate" destination="bJs-vd-C3w" id="gBQ-35-7ab"/>
+                    </connections>
+                </searchDisplayController>
+            </objects>
+            <point key="canvasLocation" x="211" y="376"/>
+        </scene>
+        <!--Navigation Controller-->
+        <scene sceneID="uyb-MF-217">
+            <objects>
+                <navigationController id="Ing-xP-gMU" sceneMemberID="viewController">
+                    <navigationBar key="navigationBar" contentMode="scaleToFill" id="2S1-Kc-4rz">
+                        <rect key="frame" x="0.0" y="0.0" width="320" height="44"/>
+                        <autoresizingMask key="autoresizingMask"/>
+                    </navigationBar>
+                    <connections>
+                        <segue destination="bJs-vd-C3w" kind="relationship" relationship="rootViewController" id="mi8-es-PtJ"/>
+                    </connections>
+                </navigationController>
+                <placeholder placeholderIdentifier="IBFirstResponder" id="15T-vu-7ax" userLabel="First Responder" sceneMemberID="firstResponder"/>
+            </objects>
+            <point key="canvasLocation" x="-507" y="376"/>
+        </scene>
+    </scenes>
+</document>
