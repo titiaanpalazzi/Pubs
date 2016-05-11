@@ -11,21 +11,24 @@ import UIKit
 import MessageUI
 import Parse
 
-class PublicationTableViewController: UITableViewController, UISearchBarDelegate, UISearchDisplayDelegate, MFMailComposeViewControllerDelegate {
+class PublicationTableViewController: UITableViewController, UISearchBarDelegate, UISearchResultsUpdating, MFMailComposeViewControllerDelegate {
     
     // ADDED
     // var lastSelectedIndexPath = NSIndexPath(forRow: 0, inSection: 0)
+    @IBOutlet weak var mailButton: UIBarButtonItem!
     
     var publications = [AnyObject]()
     var filteredPublications = [AnyObject]()
     var selectedCellTitles = [String]()
     //    var rowToSelect = NSIndexPath(forRow: 0, inSection: 0)
     
+    let searchController = UISearchController(searchResultsController: nil)
+    
     override func viewDidLoad() {
         super.viewDidLoad()
         
         // Query for Parse data
-        var query = PFQuery(className: "publicationsLibraryTest7April2014")
+        let query = PFQuery(className: "publicationsLibraryTest7April2014")
         // var query = PFQuery(className: "PublicationsLibraryTest")
         
         query.findObjectsInBackgroundWithBlock ({
@@ -37,44 +40,60 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
                 
                 let results = NSArray(array: publications!)
                 
-                for publication in results {
-                    let p = publication as! PFObject
-                    // println(p.valueForKey("fullTitle"))
-                }
+// unused
+//                for publication in results {
+//                    
+//                    let p = publication as! PFObject
+//                    
+//                    // println(p.valueForKey("fullTitle"))
+//                }
+                
                 // Fill in the array publications, defined on the line after class, with the data that's loaded in your PFQuery
                 self.publications = publications!
                 self.tableView.reloadData()
                 print(results[1])
             } else {
                 // Log details of the failure
-                NSLog("Error: %@ %@", error!, error.userInfo!)
+                NSLog("Error: \(error) \(error?.userInfo)")
             }
         })
         
         // Uncomment the following line to preserve selection between presentations
         // self.clearsSelectionOnViewWillAppear = false
+        
+        searchController.searchResultsUpdater = self
+        searchController.hidesNavigationBarDuringPresentation = false
+        searchController.dimsBackgroundDuringPresentation = false
+        searchController.searchBar.sizeToFit()
+        self.tableView.tableHeaderView = searchController.searchBar
+        
     }
     
     //    Stack Overflow answer #1 with full publication
-    func filterContentForSearchText(searchText: String) -> [AnyObject] {
+    func filterContentForSearchText(searchText: String?) -> [AnyObject] {
         filteredPublications.removeAll(keepCapacity: false)
         for publication in publications {
-            if let fullTitle = publication.valueForKey("fullTitle") as? NSString {
+            if let fullTitle = publication.valueForKey("fullTitle") as? NSString,
+                searchText = searchText {
                 if fullTitle.containsString(searchText) {
                     filteredPublications.append(publication)
+                } else {
+                    if searchText.isEmpty {
+                        filteredPublications.append(publication)
+                    }
                 }
             }
         }
         return filteredPublications
     }
     
-    func searchDisplayController(controller: UISearchDisplayController, shouldReloadTableForSearchString searchString: String!) -> Bool {
-        self.filterContentForSearchText(searchString)
-        return true
-    }
+    // MARK: UISearchResultsUpdating
     
-    //ADDED APRIL 1
-    func searchDisplayController(controller: UISearchDisplayController, willHideSearchResultsTableView tableView: UITableView) {
+    func updateSearchResultsForSearchController(searchController: UISearchController) {
+        
+        mailButton.enabled = !self.searchController.active
+
+        self.filterContentForSearchText(searchController.searchBar.text)
         self.tableView.reloadData()
     }
     
@@ -90,7 +109,7 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
     }
     
     override func tableView(tableView: UITableView, numberOfRowsInSection section: Int) -> Int {
-        if tableView == self.searchDisplayController!.searchResultsTableView {
+        if self.searchController.active {
             return self.filteredPublications.count
         } else {
             return self.publications.count
@@ -98,8 +117,8 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
     }
     
     override func tableView(tableView: UITableView, cellForRowAtIndexPath indexPath: NSIndexPath) -> UITableViewCell {
-        let cell = self.tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath) as! UITableViewCell
-        if tableView == self.searchDisplayController!.searchResultsTableView {
+        let cell = self.tableView.dequeueReusableCellWithIdentifier("Cell", forIndexPath: indexPath)
+        if self.searchController.active {
             cell.textLabel?.text = filteredPublications[indexPath.row].valueForKey("fullTitle") as? String
             cell.detailTextLabel?.text = filteredPublications[indexPath.row].valueForKey("journal") as? String
             print(filteredPublications)
@@ -107,7 +126,7 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
             cell.textLabel?.text = publications[indexPath.row].valueForKey("fullTitle") as? String
             cell.detailTextLabel?.text = publications[indexPath.row].valueForKey("journal") as? String
             
-            if  contains(selectedCellTitles, (cell.textLabel?.text)!)
+            if  selectedCellTitles.contains((cell.textLabel?.text)!)
             {
                 self.tableView.selectRowAtIndexPath(indexPath, animated: true, scrollPosition: .Top)
             }
@@ -142,7 +161,7 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
     }
     
     override func tableView(tableView: UITableView, didDeselectRowAtIndexPath indexPath: NSIndexPath) {
-        if tableView != self.searchDisplayController!.searchResultsTableView {
+        if self.searchController.active {
             // Code to store description of selected cell
             let selectedCell = tableView.cellForRowAtIndexPath(indexPath)
             print("deselect \(selectedCell)")
@@ -155,7 +174,7 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
     
     func removeObject<T : Equatable>(object: T, inout fromArray array: [T])
     {
-        var index = find(array, object)
+        let index = array.indexOf(object)
         array.removeAtIndex(index!)
     }
     
@@ -177,19 +196,23 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
         
         emailText = ""
         
-        if let selected = tableView.indexPathsForSelectedRows() {
+        if let selected = tableView.indexPathsForSelectedRows {
             // the if let in Ronald's code is used to say if any of the articles are selected, than write down the indexPaths
             
-            var selectedPublications = [PFObject]()
+// unused
+//            var selectedPublications = [PFObject]()
             
             
             for index in selected {
                 
-                let i = index as! NSIndexPath
+                let i = index
                 
                 let publication = self.publications[i.row] as! PFObject
                 let fullTitle = publication.valueForKey("fullTitle") as? String
-                let journal = publication.valueForKey("journal") as? String
+                
+// unused
+//                let journal = publication.valueForKey("journal") as? String
+                
                 let url = publication.valueForKey("url") as? String
                 
                 if let fullTitle = fullTitle {
@@ -205,7 +228,11 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
         let mailComposeViewController = configuredMailComposeViewController(emailText)
         
         if MFMailComposeViewController.canSendMail() {
-            self.presentViewController(mailComposeViewController, animated: true, completion: nil)
+            if self.searchController.active {
+                self.searchController.presentViewController(mailComposeViewController, animated: true, completion: nil)
+            } else {
+                self.presentViewController(mailComposeViewController, animated: true, completion: nil)
+            }
         } else {
             self.showSendMailErrorAlert()
         }
@@ -221,12 +248,15 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
     }
     
     func showSendMailErrorAlert() {
-        let sendMailErrorAlert = UIAlertView(title: "Could Not Send Email", message: "Your device could not send e-mail.  Please check e-mail configuration and try again.", delegate: self, cancelButtonTitle: "OK")
-        sendMailErrorAlert.show()
+        
+        let sendMailErrorAlert = UIAlertController(title: "Could Not Send Email", message: "Your device could not send e-mail.  Please check e-mail configuration and try again.", preferredStyle: .Alert)
+        sendMailErrorAlert.addAction(UIAlertAction(title: "OK", style: UIAlertActionStyle.Cancel, handler: { action -> Void in 
+        }))
+        presentViewController(sendMailErrorAlert, animated: true, completion: nil)
     }
     
     // MARK: MFMailComposeViewControllerDelegate Method
-    func mailComposeController(controller: MFMailComposeViewController!, didFinishWithResult result: MFMailComposeResult, error: NSError!) {
+    func mailComposeController(controller: MFMailComposeViewController, didFinishWithResult result: MFMailComposeResult, error: NSError?) {
         controller.dismissViewControllerAnimated(true, completion: nil)
     }
     
@@ -234,12 +264,12 @@ class PublicationTableViewController: UITableViewController, UISearchBarDelegate
         
         if segue.identifier == "MailSegue" {
             
-            if let selected = tableView.indexPathsForSelectedRows() {
+            if let selected = tableView.indexPathsForSelectedRows {
                 
                 var selectedPublications = [PFObject]()
                 for index in selected {
                     
-                    let i = index as! NSIndexPath
+                    let i = index
                     selectedPublications.append(self.publications[i.row] as! PFObject)
                 }
                 print("Selected: \(selectedPublications)")
